@@ -1,6 +1,9 @@
 CXX := g++
-CXXFLAGS := -std=c++17 -Wall -Wextra -O2
-OPENCV_FLAGS := $(shell pkg-config --cflags --libs opencv4)
+CXXFLAGS := -std=gnu++14 -fmax-errors=2 -O3 -s
+CEKEIKON_OPENCV_ROOT := /home/andre/cekeikon5/opencv2cpu
+CEKEIKON_ROOT := /home/andre/cekeikon5/cekeikon
+OPENCV_FLAGS := $(shell pkg-config $(CEKEIKON_OPENCV_ROOT)/lib/pkgconfig/opencv.pc --libs --cflags)
+CEKEIKON_FLAGS := -L$(CEKEIKON_OPENCV_ROOT)/lib -I$(CEKEIKON_OPENCV_ROOT)/include -lcekeikon2 -L$(CEKEIKON_ROOT)/bin -I$(CEKEIKON_ROOT)/src
 BIN_DIR := bin
 CPP_FILES := $(notdir $(wildcard *.cpp))
 
@@ -22,7 +25,7 @@ force:
 define CPP_TEMPLATE
 $(1): force
 	mkdir -p $(BIN_DIR)
-	$(CXX) $(CXXFLAGS) $(1) -o $(BIN_DIR)/$(basename $(1)) $(OPENCV_FLAGS)
+	$(CXX) $(CXXFLAGS) $(1) -o $(BIN_DIR)/$(basename $(1)) $(CEKEIKON_FLAGS) $(OPENCV_FLAGS)
 	./$(BIN_DIR)/$(basename $(1))
 
 endef
