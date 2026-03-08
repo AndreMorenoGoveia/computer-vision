@@ -7,8 +7,6 @@ __pycache__/
 venv/
 env/
 
-# Jupyter
-.ipynb_checkpoints/
 
 # Build artifacts
 build/
@@ -22,29 +20,4 @@ lib/
 *.a
 *.out
 
-# CMake
-CMakeFiles/
-CMakeCache.txt
-cmake_install.cmake
-compile_commands.json
-Makefile
-
-# OpenCV / generated assets
-artifacts/models/*
-artifacts/results/*
-!artifacts/models/.gitkeep
-!artifacts/results/.gitkeep
-
-# Data files
-data/images/raw/*
-data/images/processed/*
-data/datasets/*
-!data/images/raw/.gitkeep
-!data/images/processed/.gitkeep
-!data/datasets/.gitkeep
-
-# IDE / OS
-.DS_Store
-Thumbs.db
-.idea/
 .vscode/
