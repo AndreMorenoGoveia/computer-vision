@@ -1,4 +1,4 @@
-// borda.cpp
+// remove_noise.cpp
 #include <opencv2/opencv.hpp>
 using namespace std;
 using namespace cv;
