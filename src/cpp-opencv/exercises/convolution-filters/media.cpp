@@ -1,14 +1,13 @@
-//mediana.cpp - 2024
+//media.cpp - 2024
 #include <opencv2/opencv.hpp>
 using namespace std;
 using namespace cv;
 
-Mat_<uchar> mediana(Mat_<uchar> a) {
+Mat_<uchar> mediamov(Mat_<uchar> a) {
   Mat_<uchar> b(a.rows,a.cols);
-  vector<int> v;
   for (int l=0; l<b.rows; l++)
     for (int c=0; c<b.cols; c++) {
-      v.resize(0);
+      int soma=0;
       for (int l2=-1; l2<=1; l2++)
         for (int c2=-1; c2<=1; c2++) {
           int l3=l+l2; int c3=c+c2;
@@ -16,18 +15,15 @@ Mat_<uchar> mediana(Mat_<uchar> a) {
           if (a.rows<=l3) l3=a.rows-(l3-a.rows+2);
           if (c3<0) c3=-c3;
           if (a.cols<=c3) c3=a.cols-(c3-a.cols+2);
-          v.push_back(a(l3,c3));
+          soma = soma+a(l3,c3);
         }
-      //vector<int>::iterator meio=v.begin()+v.size()/2;
-      auto meio=v.begin()+v.size()/2;
-      nth_element(v.begin(), meio, v.end());
-      b(l,c) = *meio;
+      b(l,c) = round(soma/9.0);
     }
   return b;
 }
 
 int main() {
-  Mat_<uchar> a=imread("ruido.png",0);
-  Mat_<uchar> b=mediana(a);
-  imwrite("mediana_ruido.png",b);
+  Mat_<uchar> a=imread("results/ruido_media_mediana.png",0);
+  Mat_<uchar> b=mediamov(a);
+  imwrite("results/media_ruido.png",b);
 }

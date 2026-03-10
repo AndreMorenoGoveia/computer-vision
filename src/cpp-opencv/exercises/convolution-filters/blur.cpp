@@ -4,7 +4,7 @@
 using namespace std; using namespace cv;
 int main() {
   Mat_<uchar> a,b;
-  a=imread("lion.png",0);
+  a=imread("assets/lion.png",0);
   blur(a,b,Size(3,3));
-  imwrite("blur.png",b);
+  imwrite("results/blur.png",b);
 }

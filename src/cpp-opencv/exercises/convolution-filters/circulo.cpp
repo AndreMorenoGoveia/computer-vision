@@ -9,6 +9,6 @@ int main() {
       circulo(a, maxp+rand()%(nl-2*maxp), maxp+rand()%(nc-2*maxp), minp+rand()%(maxp-minp), 80, -1);
     }
     mostra(a);
-    imp(a,format("circ%02d.png",i));
+    imp(a,format("results/circ%02d.png",i));
   }
 }

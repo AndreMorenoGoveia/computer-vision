@@ -2,7 +2,7 @@
 import numpy as np
 import cv2
 #from matplotlib import pyplot as plt
-ag=cv2.imread("casa.pgm",0)
+ag=cv2.imread("assets/casa.pgm",0)
 a=np.float32(ag/255.0)
 b=cv2.GaussianBlur(a,(0,0),5)
 #plt.imshow(b,cmap="gray")

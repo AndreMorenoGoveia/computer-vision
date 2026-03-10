@@ -8,7 +8,8 @@ Mat_<uchar> rotacao(Mat_<uchar> ent, double graus, Point2f centro, Size tamanho)
 }
 
 int main() {
-  Mat_<uchar> ent=imread("a.png",0);
-  Mat_<uchar> sai=rotacao(ent,30,Point2f(ent.size())/2,ent.size());
-  imwrite("rotacao.png",sai);
+  Mat_<uchar> ent=imread("assets/a.png",0);
+  Point2f centro(ent.cols / 2.0f, ent.rows / 2.0f);
+  Mat_<uchar> sai=rotacao(ent,30,centro,ent.size());
+  imwrite("results/rotacao.png",sai);
 }

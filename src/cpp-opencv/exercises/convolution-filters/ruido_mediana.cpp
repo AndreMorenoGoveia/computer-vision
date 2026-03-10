@@ -15,7 +15,7 @@ Mat_<uchar> ruido(Mat_<uchar> a) {
 }
 
 int main() {
-  Mat_<uchar> a=imread("lion.png",0);
+  Mat_<uchar> a=imread("assets/lion.png",0);
   Mat_<uchar> b=ruido(a);
-  imwrite("ruido.png",b);
+  imwrite("results/ruido_media_mediana.png",b);
 }

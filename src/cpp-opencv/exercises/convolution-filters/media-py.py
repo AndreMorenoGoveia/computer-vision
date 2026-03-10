@@ -18,8 +18,7 @@ def mediamov(a):
       b[l,c]=round(soma/9)
   return b
 
-a=cv2.imread("lion.png",0)
+a=cv2.imread("assets/lion.png",0)
 b=mediamov(a)
-cv2.imwrite("media-py.png",b)
-
+cv2.imwrite("results/media-py.png",b)
 

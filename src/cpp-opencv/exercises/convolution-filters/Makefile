@@ -24,7 +24,7 @@ force:
 
 define CPP_TEMPLATE
 $(1): force
-	mkdir -p $(BIN_DIR)
+	mkdir -p $(BIN_DIR) results
 	$(CXX) $(CXXFLAGS) $(1) -o $(BIN_DIR)/$(basename $(1)) $(CEKEIKON_FLAGS) $(OPENCV_FLAGS)
 	./$(BIN_DIR)/$(basename $(1))
 

@@ -24,5 +24,5 @@ int main()
 {
   Mat_<uchar> a = imread("assets/lion.png", 0);
   Mat_<uchar> b = mediamov(a);
-  imwrite("results/media_borda_4.png", b);
+  imwrite("results/media_borda_5x5.png", b);
 }
