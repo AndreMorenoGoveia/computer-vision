@@ -5,12 +5,12 @@ using namespace cv;
 Mat_<uchar> mediamov(Mat_<uchar> a)
 {
   Mat_<uchar> b(a.rows, a.cols, uchar(128));
-  for (int l = 1; l < b.rows - 1; l++)
-    for (int c = 1; c < b.cols - 1; c++)
+  for (int l = 2; l < b.rows - 2; l++)
+    for (int c = 2; c < b.cols - 2; c++)
     {
       int soma = 0;
-      for (int l2 = -1; l2 <= 1; l2++)
-        for (int c2 = -1; c2 <= 1; c2++)
+      for (int l2 = -2; l2 <= 2; l2++)
+        for (int c2 = -2; c2 <= 2; c2++)
         {
           int l3 = l + l2;
           int c3 = c + c2;
@@ -22,7 +22,7 @@ Mat_<uchar> mediamov(Mat_<uchar> a)
 }
 int main()
 {
-  Mat_<uchar> a = imread("lion.png", 0);
+  Mat_<uchar> a = imread("assets/lion.png", 0);
   Mat_<uchar> b = mediamov(a);
-  imwrite("media_borda.png", b);
+  imwrite("results/media_borda_4.png", b);
 }
