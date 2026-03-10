@@ -1,13 +1,28 @@
-//media-movel.cpp - 2024
-#include "procimagem.h"
-int main(int argc, char** argv) {
-  if (argc!=3) erro("media-movel ent.pgm sai.pgm");
-  Mat_<float> ent=imread(argv[1],0);
-  Mat_<float> ker= (Mat_<float>(3,3) <<
-                  +1, +1, +1,
-                  +1, +1, +1,
-                  +1, +1, +1);
-  ker = (1.0/9.0) * ker;
-  Mat_<float> sai=filtro2d(ent,ker);
-  imwrite(argv[2],sai);
+// media_borda.cpp - 2024
+#include <opencv2/opencv.hpp>
+using namespace std;
+using namespace cv;
+Mat_<uchar> mediamov(Mat_<uchar> a)
+{
+  Mat_<uchar> b(a.rows, a.cols, uchar(128));
+  for (int l = 1; l < b.rows - 1; l++)
+    for (int c = 1; c < b.cols - 1; c++)
+    {
+      int soma = 0;
+      for (int l2 = -1; l2 <= 1; l2++)
+        for (int c2 = -1; c2 <= 1; c2++)
+        {
+          int l3 = l + l2;
+          int c3 = c + c2;
+          soma = soma + a(l3, c3);
+        }
+      b(l, c) = round(soma / 9.0);
+    }
+  return b;
+}
+int main()
+{
+  Mat_<uchar> a = imread("lion.png", 0);
+  Mat_<uchar> b = mediamov(a);
+  imwrite("media_borda.png", b);
 }
