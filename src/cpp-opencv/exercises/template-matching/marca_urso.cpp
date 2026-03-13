@@ -3,16 +3,26 @@
 
 Mat_<float> preprocessaParaMatching(const Mat_<float> &src)
 {
-    Mat_<float> borrada;
-    GaussianBlur(src, borrada, Size(5, 5), 0.0);
+    Mat_<float> mx = (Mat_<float>(3, 3) << -3.0, 0.0, +3.0,
+                      -10.0, 0.0, +10.0,
+                      -3.0, 0.0, +3.0);
+    mx = mx / 16.0;
+    Mat_<float> my = (Mat_<float>(3, 3) << -3.0, -10.0, -3.0,
+                      0.0, 0.0, 0.0,
+                      +3.0, +10.0, +3.0);
+    my = my / 16.0;
 
-    Mat_<float> gx, gy, mag;
-    Sobel(borrada, gx, CV_32F, 1, 0, 3);
-    Sobel(borrada, gy, CV_32F, 0, 1, 3);
-    magnitude(gx, gy, mag);
-    normalize(mag, mag, 0.0, 1.0, NORM_MINMAX);
+    Mat_<float> gx = filtro2d(src, mx);
+    Mat_<float> gy = filtro2d(src, my);
 
-    return mag;
+    Mat_<float> gx2;
+    pow(gx, 2, gx2);
+    Mat_<float> gy2;
+    pow(gy, 2, gy2);
+    Mat_<float> modgrad;
+    pow(gx2 + gy2, 0.5, modgrad);
+
+    return modgrad;
 }
 
 Mat_<Vec3f> marca(Mat_<float> a, Mat_<float> p, float limiar)
