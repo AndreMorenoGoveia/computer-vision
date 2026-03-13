@@ -12,6 +12,6 @@ int main()
 {
   Mat_<uchar> ent = imread("assets/a.png", 0);
   Point2f centro(ent.cols / 2.0f, ent.rows / 2.0f);
-  Mat_<uchar> sai = rotacao(ent, 30, centro, ent.size());
+  Mat_<uchar> sai = rotacao(ent, 10, centro, ent.size());
   imwrite("results/rotacao.png", sai);
 }
