@@ -1,11 +1,10 @@
-// mediana.cpp - 2024
+// remove_noise_feb.cpp - 2024
 #include <opencv2/opencv.hpp>
 using namespace std;
 using namespace cv;
 
-Mat_<uchar> mediana(Mat_<uchar> a)
+Mat_<uchar> mediana(const Mat_<uchar>& a, int raio)
 {
-  const int raio = 2;
   Mat_<uchar> b(a.rows, a.cols);
   vector<int> v;
   for (int l = 0; l < b.rows; l++)
@@ -34,12 +33,20 @@ Mat_<uchar> mediana(Mat_<uchar> a)
   return b;
 }
 
+void processaImagem(const string& entrada, const string& saida, int raio, int iteracoes)
+{
+  Mat_<uchar> a = imread(entrada, 0);
+  if (a.empty())
+    throw runtime_error("Nao foi possivel abrir a imagem: " + entrada);
+
+  for (int i = 0; i < iteracoes; i++)
+    a = mediana(a, raio);
+
+  imwrite(saida, a);
+}
+
 int main()
 {
-  Mat_<uchar> a = imread("assets/fever-2.pgm", 0);
-
-  for (int i = 0; i < 3; i++)
-    a = mediana(a);
-
-  imwrite("results/fever-2-clean.png", a);
+  processaImagem("assets/fever-1.pgm", "results/fever-1-clean.png", 1, 4);
+  processaImagem("assets/fever-2.pgm", "results/fever-2-clean.png", 2, 3);
 }
