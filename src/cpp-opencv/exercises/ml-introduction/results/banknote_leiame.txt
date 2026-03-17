@@ -1,0 +1,7 @@
+Os arquivos aqui sao resultado de processamento do arquivo assets/data_banknote_authentication.txt.
+Baixei esse arquivo de:
+  https://archive.ics.uci.edu/ml/datasets/banknote+authentication  OU
+  https://machinelearningmastery.com/standard-machine-learning-datasets/  item (5)
+
+As linhas pares (a primeira linha e' linha 0) tornaram-se exemplos de treino results/banknote_ax.txt e results/banknote_ay.txt.
+As linhas impares (a primeira linha e' linha 0) tornaram-se exemplos de teste results/banknote_qx.txt e results/banknote_qy.txt.
