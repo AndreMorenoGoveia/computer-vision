@@ -1,15 +1,8 @@
 //linear.cpp - 2024
 #include "procimagem.h"
-int main(int argc, char** argv) {
-  if (argc!=5) {
-    printf("linear: Muda resolucao de imagem usando interpolacao bilinear.\n");
-    printf("linear ent.pgm sai.pgm nl nc\n");
-    erro("Erro: Numero de argumentos invalido");
-  }
-  Mat_<uchar> a=imread(argv[1],0); if (a.total()==0) erro("Erro leitura");
-  int nl,nc;
-  if (sscanf(argv[3],"%d",&nl)!=1) erro("Erro: Leitura nl");
-  if (sscanf(argv[4],"%d",&nc)!=1) erro("Erro: Leitura nc");
+int main() {
+  Mat_<uchar> a=imread("assets/lennag.jpg",0); if (a.total()==0) erro("Erro leitura");
+  int nl=round(a.rows*1.5), nc=round(a.cols*1.5);
   Mat_<uchar> b(nl,nc);
   for (int l=0; l<b.rows; l++)
     for (int c=0; c<b.cols; c++) {
@@ -27,5 +20,5 @@ int main(int argc, char** argv) {
                 p3*a(fal+1,fac) + p4*a(fal+1,fac+1)
               );
     }
-  imwrite(argv[2],b);
+  imwrite("results/linear.jpg",b);
 }
