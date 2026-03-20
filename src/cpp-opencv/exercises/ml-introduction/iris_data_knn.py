@@ -1,6 +1,9 @@
 #iris_nn.py
 import numpy as np
+from sklearn import ensemble
+from sklearn import linear_model
 from sklearn import neighbors
+from sklearn import svm
 from sklearn import tree
 
 def le(nomearq):
@@ -37,5 +40,21 @@ erros_knn, total_knn, pct_knn = avalia_classificador(vizinho, ax, ay, qx, qy)
 arvore = tree.DecisionTreeClassifier()
 erros_dt, total_dt, pct_dt = avalia_classificador(arvore, ax, ay, qx, qy)
 
-print("KNN (k=1): Erros=%d/%d.   Pct=%1.3f%%" % (erros_knn, total_knn, pct_knn))
-print("Arvore de decisao: Erros=%d/%d.   Pct=%1.3f%%" % (erros_dt, total_dt, pct_dt))
+logreg = linear_model.LogisticRegression(max_iter=1000)
+erros_lr, total_lr, pct_lr = avalia_classificador(logreg, ax, ay, qx, qy)
+
+svc = svm.SVC()
+erros_svm, total_svm, pct_svm = avalia_classificador(svc, ax, ay, qx, qy)
+
+random_forest = ensemble.RandomForestClassifier()
+erros_rf, total_rf, pct_rf = avalia_classificador(random_forest, ax, ay, qx, qy)
+
+boost = ensemble.AdaBoostClassifier()
+erros_boost, total_boost, pct_boost = avalia_classificador(boost, ax, ay, qx, qy)
+
+print("KNN (k=1): Erros=%d/%d.   Porcentagem de erro=%1.3f%%" % (erros_knn, total_knn, pct_knn))
+print("Arvore de decisao: Erros=%d/%d.   Porcentagem de erro=%1.3f%%" % (erros_dt, total_dt, pct_dt))
+print("Regressao logistica: Erros=%d/%d.   Porcentagem de erro=%1.3f%%" % (erros_lr, total_lr, pct_lr))
+print("SVM: Erros=%d/%d.   Porcentagem de erro=%1.3f%%" % (erros_svm, total_svm, pct_svm))
+print("Random forest: Erros=%d/%d.   Porcentagem de erro=%1.3f%%" % (erros_rf, total_rf, pct_rf))
+print("Boost: Erros=%d/%d.   Porcentagem de erro=%1.3f%%" % (erros_boost, total_boost, pct_boost))
