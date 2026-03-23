@@ -1,4 +1,3 @@
-// pers.cpp grad-2018
 #include "procimagem.h"
 int main()
 {
