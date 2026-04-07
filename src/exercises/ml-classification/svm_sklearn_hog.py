@@ -138,9 +138,11 @@ def deskew(img: np.ndarray) -> np.ndarray:
         return img
 
     skew = mu11 / mu02
-    # affine_transform mapeia output -> input
-    transform = np.array([[1.0, 0.0], [-skew, 1.0]], dtype=np.float32)
-    offset = np.array([0.0, skew * img.shape[0] / 2.0], dtype=np.float32)
+    # Equivalente ao warpAffine classico:
+    # M = [[1, skew, -0.5*SZ*skew], [0, 1, 0]]
+    # No scipy, as coordenadas estao em ordem (y, x) e o mapa eh output -> input.
+    transform = np.array([[1.0, 0.0], [skew, 1.0]], dtype=np.float32)
+    offset = np.array([0.0, -0.5 * img.shape[0] * skew], dtype=np.float32)
     corrected = ndi.affine_transform(
         img,
         transform,
@@ -249,7 +251,7 @@ def extract_test_features(images: np.ndarray, jobs: int) -> np.ndarray:
 
 
 def cache_key(mnist_dir: Path, train_limit: int | None, test_limit: int | None, augment: str) -> str:
-    text = f"{mnist_dir}|{train_limit}|{test_limit}|{augment}|side20|hog4x4"
+    text = f"{mnist_dir}|{train_limit}|{test_limit}|{augment}|side20|hog4x4|deskew_v2"
     return hashlib.sha1(text.encode("utf-8")).hexdigest()[:12]
 
 
@@ -285,7 +287,7 @@ def main() -> None:
     parser.add_argument("--train-limit", type=int, default=None)
     parser.add_argument("--test-limit", type=int, default=None)
     parser.add_argument("--jobs", type=int, default=max(1, (os.cpu_count() or 2) - 1))
-    parser.add_argument("--augment", choices=["none", "shift", "full"], default="shift")
+    parser.add_argument("--augment", choices=["none", "shift", "full"], default="full")
     parser.add_argument("--model", choices=["linear", "rbf"], default="linear")
     parser.add_argument("--no-cache", action="store_true")
     args = parser.parse_args()
