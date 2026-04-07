@@ -8,6 +8,7 @@ venv/
 env/
 *.codex
 
+
 # Build artifacts
 build/
 bin/
@@ -21,3 +22,7 @@ lib/
 *.out
 
 .vscode/
+
+# datasets
+src/exercises/ml-classification/assets/carro/
+src/exercises/ml-classification/assets/pedestre/

@@ -3,7 +3,7 @@
 #include "procimagem.h"
 int main() {
   MNIST mnist(10, true, false); //10x10 e sem Bounding Box
-  mnist.le("/home/hae/cekeikon5/tiny_dnn/data"); 
+  mnist.le("/home/andre/cekeikon5/tiny_dnn/data"); 
   CvSVM ind; 
   double t1=tempo();
   ind.train(mnist.ax, mnist.ay); // Treinamento da SVM
