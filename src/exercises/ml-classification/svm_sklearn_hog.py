@@ -2,24 +2,12 @@
 """
 svm_sklearn_hog.py 2026
 
-Versao portada para bibliotecas mais fortes para classificacao classica de MNIST:
-- NumPy + SciPy para preprocessamento
-- scikit-learn para SVM
-
 Pipeline:
-1) leitura do MNIST em formato IDX (ou CSV como fallback)
-2) inverter cores, bounding box e resize para 20x20
-3) deskew
-4) HOG manual
-5) data augmentation opcional
-6) SVM do scikit-learn
-
-Depois de rodar no seu ambiente, anote no video/comentarios:
-- taxa de erro obtida
-- tempo de preprocessamento
-- tempo de treino
-- tempo de predicao
-- tecnicas usadas para baixar o erro
+1) inverter cores, bounding box e resize para 20x20
+2) deskew
+3) HOG manual
+4) data augmentation opcional
+5) SVM do scikit-learn
 """
 
 from __future__ import annotations
@@ -42,6 +30,7 @@ from sklearn.svm import LinearSVC, SVC
 DEFAULT_MNIST_DIR = Path("/home/andre/cekeikon5/tiny_dnn/data")
 DEFAULT_CSV_DIR = Path(__file__).resolve().parent / "assets" / "MNIST_CSV"
 RESULTS_DIR = Path(__file__).resolve().parent / "results"
+CACHE_VERSION = "restore_rbf_full_v1"
 
 
 def read_idx_images(path: Path, limit: int | None = None) -> np.ndarray:
@@ -106,9 +95,6 @@ def resize_to_square(img: np.ndarray, side: int) -> np.ndarray:
 
 
 def preprocess_base(img_u8: np.ndarray, side: int = 20) -> np.ndarray:
-    # MNIST original: digito branco em fundo preto.
-    # Aqui invertemos para ficar parecido com o procimagem.h:
-    # digito escuro sobre fundo claro.
     img = 255.0 - img_u8.astype(np.float32)
 
     mask = img < 250.0
@@ -121,7 +107,6 @@ def preprocess_base(img_u8: np.ndarray, side: int = 20) -> np.ndarray:
 
 
 def deskew(img: np.ndarray) -> np.ndarray:
-    # Usa "massa" do digito; como o digito é escuro, usamos 1-img.
     mass = 1.0 - img
     total = mass.sum()
     if total < 1e-6:
@@ -138,9 +123,6 @@ def deskew(img: np.ndarray) -> np.ndarray:
         return img
 
     skew = mu11 / mu02
-    # Equivalente ao warpAffine classico:
-    # M = [[1, skew, -0.5*SZ*skew], [0, 1, 0]]
-    # No scipy, as coordenadas estao em ordem (y, x) e o mapa eh output -> input.
     transform = np.array([[1.0, 0.0], [skew, 1.0]], dtype=np.float32)
     offset = np.array([0.0, -0.5 * img.shape[0] * skew], dtype=np.float32)
     corrected = ndi.affine_transform(
@@ -251,7 +233,7 @@ def extract_test_features(images: np.ndarray, jobs: int) -> np.ndarray:
 
 
 def cache_key(mnist_dir: Path, train_limit: int | None, test_limit: int | None, augment: str) -> str:
-    text = f"{mnist_dir}|{train_limit}|{test_limit}|{augment}|side20|hog4x4|deskew_v2"
+    text = f"{mnist_dir}|{train_limit}|{test_limit}|{augment}|side20|hog4x4|deskew_v2|{CACHE_VERSION}"
     return hashlib.sha1(text.encode("utf-8")).hexdigest()[:12]
 
 
@@ -288,7 +270,7 @@ def main() -> None:
     parser.add_argument("--test-limit", type=int, default=None)
     parser.add_argument("--jobs", type=int, default=max(1, (os.cpu_count() or 2) - 1))
     parser.add_argument("--augment", choices=["none", "shift", "full"], default="full")
-    parser.add_argument("--model", choices=["linear", "rbf"], default="linear")
+    parser.add_argument("--model", choices=["linear", "rbf"], default="rbf")
     parser.add_argument("--no-cache", action="store_true")
     args = parser.parse_args()
 
@@ -307,8 +289,10 @@ def main() -> None:
         y_test = qy.astype(np.int32)
         if not args.no_cache:
             save_cached_features(cache_file, x_train, y_train, x_test, y_test)
+        cache_status = "novo"
     else:
         x_train, y_train, x_test, y_test = cached
+        cache_status = "existente"
 
     t1 = time.time()
     clf = build_model(args.model)
@@ -322,10 +306,6 @@ def main() -> None:
     print(f"Tempo de preprocessamento: {t1 - t0:.6f}")
     print(f"Tempo de treino: {t2 - t1:.6f}")
     print(f"Tempo de predicao: {t3 - t2:.6f}")
-    print(f"Modelo: sklearn {args.model}")
-    print(f"Augmentation: {args.augment}")
-    print(f"Amostras treino usadas: {x_train.shape[0]}")
-    print(f"Atributos por amostra: {x_train.shape[1]}")
 
 
 if __name__ == "__main__":
