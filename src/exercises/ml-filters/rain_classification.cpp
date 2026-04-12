@@ -58,5 +58,5 @@ int main() {
       if (contagemPreto>=8)
         qpred(l,c)[2]=255;
     }
-  imwrite("results/f1-rain-flann-red.png",qpred);
+  imwrite("results/f1-rain-flann-red-final.png",qpred);
 }

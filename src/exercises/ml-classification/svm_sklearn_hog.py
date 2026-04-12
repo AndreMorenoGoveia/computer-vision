@@ -6,7 +6,7 @@ Pipeline:
 1) inverter cores, bounding box e resize para 20x20
 2) deskew
 3) HOG manual
-4) data augmentation opcional
+4) data augmentation
 5) SVM do scikit-learn
 """
 
