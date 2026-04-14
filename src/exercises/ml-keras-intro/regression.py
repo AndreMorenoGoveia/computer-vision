@@ -6,26 +6,27 @@ import tensorflow.keras as keras
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Activation
 from tensorflow.keras import optimizers
+from tensorflow.keras.initializers import HeNormal
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 #Define modelo de rede
 model = Sequential()
-model.add(Dense(4, activation='tanh', input_dim=2))
-model.add(Dense(1, activation='sigmoid'))
+model.add(Dense(4, activation='relu', input_dim=2, 
+                kernel_initializer=HeNormal(),
+                bias_initializer='zeros'))
+model.add(Dense(1, activation='linear')) 
 
-opt = keras.optimizers.Adam(learning_rate=0.01)
-model.compile(optimizer=opt, loss='mse')
+sgd = optimizers.SGD(learning_rate=0.1)
+model.compile(optimizer=sgd, loss='mse')
 
 AX = np.matrix('0.5 0.5; 0.0 0.0; 0.0 1.0; 1.0 0.0; 1.0 1.0; 0.5 0.0; 0.0 0.5; 0.5 1.0; 1.0 0.5',dtype='float32')
 AY = np.matrix('1.0; 0.0; 0.0; 0.0; 0.0; 0.0; 0.0; 0.0; 0.0', dtype='float32')
 
-
-
 print("AX"); print(AX)
 print("AY"); print(AY)
 # As opcoes sao usar batch_size=2 ou 1
-model.fit(AX, AY, epochs=2000, batch_size=1, verbose=2)
+model.fit(AX, AY, epochs=6025, batch_size=1, class_weight={0: 1.0, 1: 4.0})
 # Print the trained parameters
 print("\nTrained MLP Parameters:")
 for layer in model.layers:
@@ -36,7 +37,8 @@ for layer in model.layers:
         print(f" Biases: \n{weights[1]}")
 
 
-QX = np.matrix('1 0; 0 1; 0 0; 1 1',dtype='float32')
+QX = np.matrix('0.5 0.5; 0.0 0.0; 0.0 1.0; 1.0 0.0; 1.0 1.0; 0.5 0.0; 0.0 0.5; 0.5 1.0; 1.0 0.5', dtype='float32')
+
 print("QX"); print(QX)
 QP=model.predict(QX, verbose=2)
 print("QP"); print(QP)
