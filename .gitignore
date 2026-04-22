@@ -26,6 +26,7 @@ lib/
 # datasets
 src/exercises/ml-classification/assets/carro/
 src/exercises/ml-classification/assets/pedestre/
+data/
 
 # experiment caches
 src/exercises/ml-classification/results/*.npz
