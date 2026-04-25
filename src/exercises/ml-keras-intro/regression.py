@@ -10,7 +10,7 @@ from tensorflow.keras.initializers import HeNormal
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-#Define modelo de rede
+#Define modelo de rede/
 model = Sequential()
 model.add(Dense(4, activation='relu', input_dim=2, 
                 kernel_initializer=HeNormal(),
