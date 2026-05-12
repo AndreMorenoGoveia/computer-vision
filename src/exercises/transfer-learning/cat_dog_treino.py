@@ -1,23 +1,3 @@
-"""
-Extra Homework — Cat vs Dog classifier using ResNet50 transfer learning.
-Saves the best model as transf.keras (run cat_dog_teste.py afterwards).
-
-Training set: 4 000 cats + 4 000 dogs
-Expected error rate: <1.25 %  (>98.75 % accuracy)
-
-Data is loaded lazily via image_dataset_from_directory to avoid exhausting RAM
-(loading 8 000 × 224×224 images as float32 arrays would require ~4.5 GB).
-
-Directory layout expected after extraction:
-    cat_dog_clean/
-        training_set/
-            cats/   ← cat.1.jpg … cat.4000.jpg
-            dogs/   ← dog.1.jpg … dog.4000.jpg
-        test_set/
-            cats/
-            dogs/
-"""
-
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
@@ -44,25 +24,14 @@ if not os.path.exists('cat_dog_clean'):
     os.system(f'unzip -u {ZIP_NAME}')
 
 # ---------------------------------------------------------------------------
-# Locate train directory (handles naming variations)
+# Paths
 # ---------------------------------------------------------------------------
 
-BASE_DIR = 'cat_dog_clean'
-
-
-def find_dir(parent, candidates):
-    for name in candidates:
-        path = os.path.join(parent, name)
-        if os.path.isdir(path):
-            return path
-    raise FileNotFoundError(f'None of {candidates} found under {parent}')
-
-
-train_dir = find_dir(BASE_DIR, ['training_set', 'train', 'Train'])
-print(f'Training directory: {train_dir}')
+TRAIN_DIR = os.path.join('cat_dog_clean', 'dog-and-cat', 'training_set')
+print(f'Training directory: {TRAIN_DIR}')
 
 # ---------------------------------------------------------------------------
-# tf.data pipelines  (reads images on-demand — no full dataset in RAM)
+# tf.data pipelines
 # ---------------------------------------------------------------------------
 
 NL, NC = 224, 224
@@ -73,10 +42,10 @@ SEED = 42
 
 def make_dataset(subset):
     return tf.keras.utils.image_dataset_from_directory(
-        train_dir,
+        TRAIN_DIR,
         image_size=(NL, NC),
         batch_size=BATCH_SIZE,
-        label_mode='binary',   # cats=0, dogs=1  (alphabetical order)
+        label_mode='binary',   # cats=0, dogs=1
         shuffle=True,
         seed=SEED,
         validation_split=VAL_SPLIT,

@@ -1,16 +1,9 @@
-"""
-Extra Homework — Evaluate the cat-vs-dog classifier saved by cat_dog_treino.py.
-
-Loads transf.keras, classifies the test set, reports the error rate, and
-displays the first 10 misclassified cats and the first 10 misclassified dogs.
-"""
-
 import os
 import glob
 
 import numpy as np
 import matplotlib
-matplotlib.use('Agg')   # works even without a display; remove for interactive
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 from tensorflow import keras
@@ -21,20 +14,9 @@ from tensorflow.keras.preprocessing import image as keras_image
 # Locate test directories
 # ---------------------------------------------------------------------------
 
-BASE_DIR = 'cat_dog_clean'
-
-
-def find_dir(parent, candidates):
-    for name in candidates:
-        path = os.path.join(parent, name)
-        if os.path.isdir(path):
-            return path
-    raise FileNotFoundError(f'None of {candidates} found under {parent}')
-
-
-test_dir = find_dir(BASE_DIR, ['test_set', 'test', 'Test'])
-cat_dir = find_dir(test_dir, ['cats', 'cat'])
-dog_dir = find_dir(test_dir, ['dogs', 'dog'])
+TEST_DIR = os.path.join('dog-and-cat', 'test_set')
+cat_dir = os.path.join(TEST_DIR, 'cats')
+dog_dir = os.path.join(TEST_DIR, 'dogs')
 
 cat_files = sorted(glob.glob(os.path.join(cat_dir, '*.jpg')))
 dog_files = sorted(glob.glob(os.path.join(dog_dir, '*.jpg')))
@@ -83,7 +65,7 @@ dog_preds = predict_files(dog_files)
 
 # ---------------------------------------------------------------------------
 # Metrics
-# The model outputs probability of being a dog (class 1, alphabetically second).
+# The model outputs probability of being a dog.
 # cats  → true label 0,  predicted cat when pred ≤ 0.5
 # dogs  → true label 1,  predicted dog when pred > 0.5
 # ---------------------------------------------------------------------------
