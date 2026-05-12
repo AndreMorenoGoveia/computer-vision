@@ -12,10 +12,7 @@ from tensorflow.keras.callbacks import LearningRateScheduler, ModelCheckpoint, R
 file_id = '1vAVoVbz24HDU98RiorptkvpLTX4qp_VD'
 output = 'stl10_labeled.npz'
 if not os.path.exists(output):
-    gdown.download(
-        f'https://drive.google.com/file/d/{file_id}/view?usp=drive_link',
-        output, quiet=False, fuzzy=True
-    )
+    gdown.download(id=file_id, output=output, quiet=False)
 
 with np.load(output) as data:
     X_train = data['X_train']
