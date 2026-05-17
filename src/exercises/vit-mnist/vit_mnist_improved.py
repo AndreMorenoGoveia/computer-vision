@@ -1,24 +1,20 @@
-# Alterações introduzidas em relação ao programa original (tr02c.py):
+# Alterações introduzidas em relação ao programa original:
 #
 # 1. DATA AUGMENTATION: RandomRotation (±18°), RandomTranslation (±10%),
-#    RandomZoom (±10%). Amplia a variabilidade dos dados de treino sem coletar
-#    novas amostras, reduzindo overfitting.
+#    RandomZoom (±10%).
 #
 # 2. WARMUP + COSINE DECAY: as primeiras 5 épocas aumentam o LR linearmente
-#    até o valor base; depois, decai em cosine até zero. Evita instabilidade
-#    inicial e garante convergência suave no final.
+#    até o valor base; depois, decai em cosine até zero.
 #
-# 3. LABEL SMOOTHING (ε=0.1): suaviza os alvos de 1.0 para 0.9, penalizando
-#    predições excessivamente confiantes e melhorando generalização.
+# 3. LABEL SMOOTHING (ε=0.1): suaviza os alvos de 1.0 para 0.9.
 #
 # 4. STOCHASTIC DEPTH (DropPath): zera aleatoriamente blocos inteiros do
 #    transformer durante o treino (taxa cresce linearmente de 0 a 10%).
-#    Regularização específica para redes profundas.
 #
-# 5. MAIS CAMADAS TRANSFORMER: 6 blocos (original: 4). Aumenta a capacidade
-#    do modelo de capturar relações complexas entre patches.
+# 5. MAIS CAMADAS TRANSFORMER: 6 blocos.
 #
-# 6. EARLY STOPPING com restauração dos melhores pesos (patience=20).
+# 6. TEST-TIME AUGMENTATION (TTA x10): média de 10 predições augmentadas
+#    na inferência
 
 import os
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
@@ -50,6 +46,7 @@ MLP_HEAD_UNITS    = [2048, 1024]
 STOCH_DEPTH_MAX   = 0.10
 LABEL_SMOOTHING   = 0.10
 WARMUP_EPOCHS     = 5
+TTA_STEPS         = 10
 
 # ---------------------------------------------------------------------------
 # Dados
@@ -116,7 +113,7 @@ class StochasticDepth(layers.Layer):
         return cfg
 
 # ---------------------------------------------------------------------------
-# Patches e PatchEncoder (iguais ao original)
+# Patches e PatchEncoder
 # ---------------------------------------------------------------------------
 class Patches(layers.Layer):
     def __init__(self, patch_size):
@@ -219,12 +216,6 @@ model.compile(
     metrics=[keras.metrics.CategoricalAccuracy(name="accuracy")],
 )
 
-callbacks = [
-    keras.callbacks.EarlyStopping(
-        monitor="val_accuracy", patience=20, restore_best_weights=True
-    ),
-]
-
 # ---------------------------------------------------------------------------
 # Treinamento
 # ---------------------------------------------------------------------------
@@ -235,13 +226,12 @@ history = model.fit(
     batch_size=BATCH_SIZE,
     epochs=NUM_EPOCHS,
     validation_split=0.1,
-    callbacks=callbacks,
 )
 
 # ---------------------------------------------------------------------------
 # Curvas
 # ---------------------------------------------------------------------------
-output_dir = os.path.dirname(os.path.abspath(__file__))
+output_dir = os.path.dirname(os.path.abspath(__file__)) if "__file__" in globals() else os.getcwd()
 
 plt.figure()
 plt.plot(history.history["accuracy"],     label="train")
@@ -264,8 +254,23 @@ plt.savefig(os.path.join(output_dir, "vit_mnist_improved_loss.png"))
 plt.close()
 
 # ---------------------------------------------------------------------------
-# Avaliação final
+# Avaliação final com TTA
 # ---------------------------------------------------------------------------
-_, accuracy = model.evaluate(x_test, y_test_oh, verbose=0)
-print(f"\nTest accuracy: {round(accuracy * 100, 2)}%")
+@tf.function
+def tta_predict(images):
+    """Média de TTA_STEPS predições com augmentações aleatórias."""
+    probs = tf.zeros((tf.shape(images)[0], NUM_CLASSES))
+    for _ in range(TTA_STEPS):
+        aug = data_augmentation(images, training=True)
+        logits = model(aug, training=False)
+        probs = probs + tf.nn.softmax(logits)
+    return probs / TTA_STEPS
+
+tta_probs = tta_predict(x_test)
+tta_preds = tf.argmax(tta_probs, axis=1)
+tta_accuracy = tf.reduce_mean(tf.cast(tf.equal(tta_preds, tf.cast(y_test, tf.int64)), tf.float32)).numpy()
+
+_, base_accuracy = model.evaluate(x_test, y_test_oh, verbose=0)
+print(f"\nTest accuracy (sem TTA): {round(base_accuracy * 100, 2)}%")
+print(f"Test accuracy (com TTA x{TTA_STEPS}): {round(tta_accuracy * 100, 2)}%")
 print("(baseline original tr02c.py: 99.10%)")
